@@ -20,14 +20,13 @@ func (d *DoNothingStore) QueryEvents(filter *nostr.Filter) ([]nostr.Event, error
 
 type Relay struct{}
 
-// Implement relayer interface
+// Implement relays's Relay interface
 func (r *Relay) Name() string                  { return "ForwardOnlyRelay" }
 func (r *Relay) Storage() relayer.Storage      { return &DoNothingStore{} }
 func (r *Relay) OnInitialized(*relayer.Server) {}
 func (r *Relay) Init() error                   { return nil }
 func (r *Relay) BeforeSave(evt *nostr.Event)   {}
 func (r *Relay) AfterSave(evt *nostr.Event)    {}
-
 func (r *Relay) AcceptEvent(evt *nostr.Event) bool {
 	// block events that are too large
 	jsonb, _ := json.Marshal(evt)
@@ -35,8 +34,7 @@ func (r *Relay) AcceptEvent(evt *nostr.Event) bool {
 }
 
 func main() {
-	r := Relay{}
-	if err := relayer.Start(&r); err != nil {
+	if err := relayer.Start(&Relay{}); err != nil {
 		log.Fatalf("server terminated: %v", err)
 	}
 }
